@@ -2,7 +2,9 @@
 title: "R4DS - Exercises"
 author: "Maria Czapczyk"
 date: "2023-04-24"
-output: html_document
+output:
+  html_document: default
+  pdf_document: default
 ---
 
 ## Penguins dataset 
@@ -160,47 +162,242 @@ ggplot() +
 
 Answer: These two graphs will produce the same plot.
 
+#### 2.4.3 Exercises 
+
+**1. Make a bar plot of species of penguins, where you assign species to the y aesthetic. How is this plot different?**
 
 
+```{r}
+ggplot(penguins, aes(y = species)) +
+  geom_bar()
+```
+Answer: In this plot, the aes mapping assigns the species names to the y axis of the plot. 
 
 
+**2. How are the following two plots different? Which aesthetic, color or fill, is more useful for changing the color of bars?**
 
+```{r}
+ggplot(penguins, aes(x = species)) +
+  geom_bar(color = "red")
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+ggplot(penguins, aes(x = species)) +
+  geom_bar(fill = "red")
 ```
 
-## R Markdown
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+Answer: Definitely fill is more useful.
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
 
-```{r cars}
-summary(cars)
+**3. How are the following two plots different? Which aesthetic, color or fill, is more useful for changing the color of bars?**
+
+Answer: The bins argument in geom_histogram() specifies the number of bins to use for dividing the range of the data into intervals, which are then used to construct the histogram.
+
+**4. Make a histogram of the carat variable in the diamonds dataset that is available when you load the tidyverse package. Experiment with different binwidths. What binwidth reveals the most interesting patterns?**
+
+Option 1: binwidth = 2
+```{r}
+ggplot(diamonds, aes(x = carat)) +
+  geom_histogram(binwidth = 2)
 ```
 
-## Including Plots
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
+Option 2:binwidth = 1
+```{r}
+ggplot(diamonds, aes(x = carat)) +
+  geom_histogram(binwidth = 1)
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+Option 3: binwidth = .1
+```{r}
+ggplot(diamonds, aes(x = carat)) +
+  geom_histogram(binwidth = .1)
+```
+
+
+
+Option 4: binwidth = .5
+```{r}
+ggplot(diamonds, aes(x = carat)) +
+  geom_histogram(binwidth = .2)
+```
+
+Answer:  IMO option number 3 is the best and represents the best distribution of variables.
+
+
+```{r}
+
+```
+
+
+#### 2.5.5 Exercises 
+
+**1. The mpg data frame that is bundled with the ggplot2 package contains 234 observations collected by the US Environmental Protection Agency on 38 car models. Which variables in mpg are categorical? Which variables are numerical? (Hint: Type ?mpg to read the documentation for the dataset.) How can you see this information when you run mpg?**
+
+```{r}
+?mpg
+```
+
+Categorical: 
+
+- manufacturer
+
+- model
+
+- trans
+
+- drv
+
+- fl
+
+- class
+
+Numerical:
+
+- displ
+
+- year
+ 
+- cyl
+
+- cty
+
+- hwy
+
+To see this information when you run mpg in R, we can use the str function.
+
+```{r}
+str(mpg)
+```
+
+
+**2. Make a scatterplot of hwy vs. displ using the mpg data frame.**
+
+```{r}
+ggplot(mpg, aes(x = displ, y = hwy)) +
+  geom_point()
+```
+
+**Next, map a third, numerical variable to color,**
+
+```{r}
+ggplot(mpg, aes(x = displ, y = hwy, color = cyl)) +
+  geom_point()
+```
+**then size**
+
+```{r}
+ggplot(mpg, aes(x = displ, y = hwy, size = cyl)) +
+  geom_point()
+```
+
+**then both color and size,**
+
+```{r}
+ggplot(mpg, aes(x = displ, y = hwy, size = cyl, color = cyl)) +
+  geom_point()
+```
+
+**then shape**
+
+It's not possible to assign numerical variable to shape parameter.
+
+```{r}
+ggplot(mpg, aes(x = displ, y = hwy, size = cyl, color = cyl, shape = trans)) +
+  geom_point()
+```
+
+**How do these aesthetics behave differently for categorical vs. numerical variables?****
+
+Answer: When mapping aesthetics to categorical variables, each category is given a unique value for the aesthetic (e.g., a unique color or shape). This allows us to distinguish between the categories, but there is no inherent ordering or relationship between the categories.
+
+When mapping aesthetics to numerical variables, the values of the aesthetic are based on the values of the numerical variable. For example, when we mapped the engine displacement (displ) to size, the larger the engine displacement, the larger the size of the point. This allows us to see patterns in the data based on the values of the numerical variable.
+
+**3. In the scatterplot of hwy vs. displ, what happens if you map a third variable to linewidth?**
+
+```{r}
+ggplot(mpg, aes(x = displ, y = hwy, linewidth = year)) +
+  geom_point()
+```
+
+Answer: Nothing special (?)
+
+**4. What happens if you map the same variable to multiple aesthetics? **
+
+Answer: We will get observations arranged in a straight line.
+
+**5. Make a scatterplot of bill_depth_mm vs. bill_length_mm and color the points by species. What does adding coloring by species reveal about the relationship between these two variables? What about faceting by species?**
+
+```{r}
+ggplot(penguins, aes(x = bill_depth_mm, y = bill_length_mm)) +
+  geom_point(aes(color = species)) +
+  facet_wrap(~species)
+
+```
+Answer: Doesn't seem like facet_wrap(~species) very useful, we'll get 3 graphs for each species separately.
+
+**6. Why does the following yield two separate legends? How would you fix it to combine the two legends?**
+
+```{r}
+ggplot(
+  data = penguins,
+  mapping = aes(
+    x = bill_length_mm, y = bill_depth_mm, 
+    color = species, shape = species
+  )
+) +
+  geom_point() +
+  labs(color = "Species")
+```
+Answer: We can remove "color ="
+
+```{r}
+ggplot(
+  data = penguins,
+  mapping = aes(
+    x = bill_length_mm, y = bill_depth_mm, 
+    color = species, shape = species
+  )
+) +
+  geom_point() +
+  labs("Species")
+```
+
+**7. Create the two following stacked bar plots. Which question can you answer with the first one? Which question can you answer with the second one?**
+
+```{r}
+ggplot(penguins, aes(x = island, fill = species)) +
+  geom_bar(position = "fill")
+```
+```{r}
+ggplot(penguins, aes(x = species, fill = island)) +
+  geom_bar(position = "fill")
+
+```
+
+Answer: The first stacked bar plot shows the proportion of penguin species on each island. This plot can answer the question "What is the distribution of penguin species across the different islands?"
+
+The second stacked bar plot shows the proportion of penguins on each island for each species. This plot can answer the question "How are the penguins distributed across the different islands for each species?"
+
+
+#### 2.6.1 Exercises 
+
+**1. Run the following lines of code. Which of the two plots is saved as mpg-plot.png? Why?**
+
+```{r}
+ggplot(mpg, aes(x = class)) +
+  geom_bar()
+ggplot(mpg, aes(x = cty, y = hwy)) +
+  geom_point()
+ggsave("mpg-plot.png")
+```
+Answer: The second plot is saved as mpg-plot.png, which shows a scatterplot of cty vs hwy. This is because ggsave saves the last plot that was created using ggplot2.
+
+**2. What do you need to change in the code above to save the plot as a PDF instead of a PNG? How could you find out what types of image files would work in ggsave()?**
+
+To save the plot as a PDF instead of a PNG, you can change the file extension in the ggsave() function to .pdf.
+
+```{r}
+ggsave("mpg-plot.pdf")
+```
+
+To find out what types of image files would work in ggsave(), you can use the ?ggsave command to bring up the documentation for the function. 
+
